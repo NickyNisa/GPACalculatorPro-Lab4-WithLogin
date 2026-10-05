@@ -1,4 +1,5 @@
 <template>
+  
   <q-page class="flex flex-center bg-grey-2">
     <q-card class="q-pa-md shadow-2" style="width: 100%; max-width: 400px; border-radius: 12px">
       <q-card-section class="text-center">
@@ -18,10 +19,18 @@
           <q-input
             outlined
             v-model="password"
-            type="password"
+            :type="isPwd ? 'password' : 'text'"
             label="Password"
             :rules="[(val) => !!val || 'กรุณากรอก Password']"
-          />
+          >
+            <template v-slot:append>
+              <q-icon
+                :name="isPwd ? 'visibility_off' : 'visibility'"
+                class="cursor-pointer"
+                @click="isPwd = !isPwd"
+              />
+            </template>
+          </q-input>
 
           <q-btn
             type="submit"
@@ -39,6 +48,24 @@
         <div>Password: 123456</div>
       </q-card-section>
     </q-card>
+    <q-dialog v-model="showErrorDialog">
+      <q-card style="min-width: 320px; border-radius: 8px">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-h6 flex items-center">
+            <q-icon name="error" color="negative" size="28px" class="q-mr-sm" />
+            Login Failed
+          </div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-md text-body1">
+          Username หรือ Password ไม่ถูกต้อง
+        </q-card-section>
+
+        <q-card-actions align="right">
+          <q-btn flat label="OK" color="primary" v-close-popup />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -46,24 +73,20 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/authStore'
-import { useQuasar } from 'quasar'
 
 const username = ref('')
 const password = ref('')
 const router = useRouter()
 const authStore = useAuthStore()
-const $q = useQuasar()
+const showErrorDialog = ref(false)
+const isPwd = ref(true)
 
 const handleLogin = () => {
   if (username.value === 'student' && password.value === '123456') {
     authStore.login(username.value)
     router.push('/')
   } else {
-    $q.dialog({
-      title: 'Login Failed',
-      message: 'Username หรือ Password ไม่ถูกต้อง',
-      color: 'negative',
-    })
+    showErrorDialog.value = true
   }
 }
 </script>

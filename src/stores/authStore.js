@@ -20,6 +20,6 @@ export const useAuthStore = defineStore(
     return { isLoggedIn, username, login, logout }
   },
   {
-    persist: true,
+    persist: { key: 'gpa-pro-auth-data' },
   },
 )
